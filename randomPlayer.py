@@ -10,7 +10,6 @@ class myPlayer(PlayerInterface):
     def __init__(self):
         self._board = Reversi.Board(10)
         self._mycolor = None
-        self._depth = 3
 
     def getPlayerName(self):
         return "Random Player"
@@ -43,5 +42,4 @@ class myPlayer(PlayerInterface):
             print("I won!!!")
         else:
             print("I lost :(!!")
-
 
