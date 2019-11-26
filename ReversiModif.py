@@ -29,7 +29,7 @@ class Board:
       self._stack= []
       self._successivePass = 0
       
-      self._minEvalBoard = -1 # min - 1
+      self._minEvalBoard = 0 # min - 1
       self._maxEvalBoard = self._boardsize * self._boardsize + 4 * self._boardsize + 4 + 1 # max + 1
 
     def reset(self):
@@ -204,7 +204,7 @@ class Board:
         return moves
 
     # Exemple d'heuristique tres simple : compte simplement les pieces
-    def heuristique(self, player):
+    '''def heuristique(self, player):
         tot = 0
         for y in range(self._boardsize):
             for x in range(self._boardsize):
@@ -215,7 +215,14 @@ class Board:
                         tot += 2 # side
                     else:
                         tot += 1
-        return tot
+        return tot'''
+
+    def heuristique(self, player=None):
+        if player is None:
+            player = self._nextPlayer
+        if player is self._WHITE:
+            return self._nbWHITE - self._nbBLACK
+        return self._nbBLACK - self._nbWHITE
 
     def _piece2str(self, c):
         if c==self._WHITE:
@@ -241,7 +248,7 @@ class Board:
 
 
 
-    def Minimax(self, player, depth, maximizingPlayer):
+    '''def Minimax(self, player, depth, maximizingPlayer):
         
         if depth ==0 or not(self.at_least_one_legal_move(player)):  
             return self.heuristique(player)
@@ -251,6 +258,7 @@ class Board:
             for m in self.legal_moves():
                 self.push(m)
                 v=self.Minimax(player,depth-1,False)
+                #print("move :",m," points :",v)
                 self.pop()
                 bestValue=max(bestValue,v)
                 
@@ -259,10 +267,11 @@ class Board:
             for m in self.legal_moves():
                 self.push(m)
                 v=self.Minimax(player,depth-1,True)
+                #print("move :",m," points :",v)
                 self.pop()
                 bestValue=min(bestValue,v)
                 
-        return bestValue
+        return bestValue'''
     
     
     
@@ -294,15 +303,17 @@ class Board:
                     
             return v
         
-    def bestMove(self, player, depth):
+    '''def bestMove(self, player, depth):
         maxPoints = 0
         mx = -1; my = -1
         for m in self.legal_moves():
+            print(m)
             
-            self.push(m)
             points = self.Minimax(player, depth, True)
-            self.pop()
-            if points > maxPoints:
+
+            
+            if points >= maxPoints:
                     maxPoints = points
-                    mx = x; my = y
-        return (player, mx, my)
+                    mx = m[1]; my = m[2]
+        print("player=",player," mx=",mx," my=",my)
+        return [player, mx, my]'''
