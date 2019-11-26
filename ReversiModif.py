@@ -293,3 +293,16 @@ class Board:
                     break # alpha cut-off
                     
             return v
+        
+    def bestMove(self, player, depth):
+        maxPoints = 0
+        mx = -1; my = -1
+        for m in self.legal_moves():
+            
+            self.push(m)
+            points = self.Minimax(player, depth, True)
+            self.pop()
+            if points > maxPoints:
+                    maxPoints = points
+                    mx = x; my = y
+        return (player, mx, my)

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
-import Reversi
+import ReversiModif
 from random import randint
 from playerInterface import *
 
 class myPlayer(PlayerInterface):
 
     def __init__(self):
-        self._board = Reversi.Board(10)
+        self._board = ReversiModif.Board(10)
         self._mycolor = None
         self._depth = 3
 
@@ -19,8 +19,7 @@ class myPlayer(PlayerInterface):
         if self._board.is_game_over():
             print("Referee told me to play but the game is over!")
             return (-1,-1)
-        moves = [m for m in self._board.legal_moves()]
-        move = moves[randint(0,len(moves)-1)]
+        move=self._board.bestMove(self,self._depth)
         self._board.push(move)
         print("I am playing ", move)
         (c,x,y) = move
@@ -28,6 +27,9 @@ class myPlayer(PlayerInterface):
         print("My current board :")
         print(self._board)
         return (x,y) 
+    
+    
+    
 
     def playOpponentMove(self, x,y):
         assert(self._board.is_valid_move(self._opponent, x, y))

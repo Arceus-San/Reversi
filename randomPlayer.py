@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import time
-import Reversi
+import ReversiModif
 from random import randint
 from playerInterface import *
 
 class myPlayer(PlayerInterface):
 
     def __init__(self):
-        self._board = Reversi.Board(10)
+        self._board = ReversiModif.Board(10)
         self._mycolor = None
 
     def getPlayerName(self):
