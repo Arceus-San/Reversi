@@ -1,5 +1,5 @@
 #import Reversi
-import ReversiModif
+import Reversi
 import myPlayer
 import randomPlayer
 import time
@@ -12,7 +12,7 @@ cptEgal=0
 cptIM=0
 
 for i in range(0,5):
-    b = ReversiModif.Board(10)
+    b = Reversi.Board(10)
 
     players = []
     player1 = myPlayer.myPlayer()

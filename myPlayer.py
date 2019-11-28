@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import time
-import ReversiModif
+import Reversi
 from random import randint
 from playerInterface import *
 
 class myPlayer(PlayerInterface):
 
     def __init__(self):
-        self._board = ReversiModif.Board(10)
+        self._board = Reversi.Board(10)
         self._mycolor = None
         self._depth = 4
+        
+        self._minEvalBoard = 0 # min - 1
+        self._maxEvalBoard = self._board._boardsize * self._board._boardsize + 4 * self._board._boardsize + 4 + 1 # max + 1
 
     def getPlayerName(self):
         return "AI Player"
@@ -54,14 +57,29 @@ class myPlayer(PlayerInterface):
             for y in range(self._board._boardsize):
                 if(self._board._board[x][y]==self._mycolor):
                     if (x == 0 or x == self._board._boardsize - 1) and (y == 0 or y == self._board._boardsize - 1):
-                        tot += 4 # corner
-                    elif (x == 0 or x == self._board._boardsize - 1) or (y == 0 or y == self._board._boardsize - 1):
-                        tot += 2 # side
+                        tot +=5 # corner                     
+                    elif ((x>1 and x<self._board._boardsize - 2 and (y==0 or y==self._board._boardsize - 1)) or (y>1 and y<self._board._boardsize - 2 and (x==0 or x==self._board._boardsize - 1))):
+                        tot +=3
+                    elif(x>1 and x<self._board._boardsize - 2 and y>1 and y<self._board._boardsize - 2):
+                        tot +=4
+                    elif((x>1 and x<self._board._boardsize - 2 and (y==1 or y==self._board._boardsize - 2)) or (y>1 and y<self._board._boardsize - 2) and  (x==1 or x==self._board._boardsize - 2)):
+                        tot+=2
                     else:
                         tot += 1
-        
-        
+    
         return tot
+    
+    
+        ''' 5133333315
+            1122222211
+            3244444423
+            3244444423
+            3244  4423
+            3244  4423
+            3244444423
+            3244444423
+            1122222211
+            5133333315'''
     
     def Minimax(self, depth, maximizingPlayer):
         
@@ -70,7 +88,7 @@ class myPlayer(PlayerInterface):
             return self.heuristique(self._mycolor)
 
         if maximizingPlayer:
-            bestValue = self._board._minEvalBoard
+            bestValue = self._minEvalBoard
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v=self.Minimax(depth-1,False)
@@ -78,7 +96,7 @@ class myPlayer(PlayerInterface):
                 bestValue=max(bestValue,v)
                 
         else: #minimizingplayer
-            bestValue = self._board._maxEvalBoard
+            bestValue = self._maxEvalBoard
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v=self.Minimax(depth-1,True)
@@ -95,7 +113,7 @@ class myPlayer(PlayerInterface):
             return self.heuristique(self._mycolor)
         
         if maximizingPlayer:
-            v = self._board._minEvalBoard
+            v = self._minEvalBoard
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v= max(v,self.AlphaBeta(depth - 1, alpha, beta, False))
@@ -106,7 +124,7 @@ class myPlayer(PlayerInterface):
             return v
         
         else:
-            v =self._board._maxEvalBoard
+            v =self._maxEvalBoard
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v=v = min(v, self.AlphaBeta(depth - 1, alpha, beta, True))
@@ -123,7 +141,7 @@ class myPlayer(PlayerInterface):
         for m in self._board.legal_moves():
             print(m)
             
-            points = self.AlphaBeta(depth,self._board._minEvalBoard,self._board._maxEvalBoard, True)
+            points = self.AlphaBeta(depth,self._minEvalBoard,self._maxEvalBoard, True)
             #points = self.Minimax(depth, True)
             
             if points > maxPoints:
