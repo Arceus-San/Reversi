@@ -82,36 +82,10 @@ class myPlayer(PlayerInterface):
             1122222211
             5133333315'''
 
-    def Minimax(self, depth, maximizingPlayer):
-
-        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
-            return self.heuristique(self._mycolor)
-
-        if maximizingPlayer:
-            bestValue = -(float('infinity'))
-            for m in self._board.legal_moves():
-                if(time.time()-self._time>self._timelimit):
-                    break
-                self._board.push(m)
-                v=self.Minimax(depth-1,False)
-                bestValue=max(bestValue,v)
-                self._board.pop()
-            return bestValue
-
-        else: #minimizingplayer
-            bestValue = float('infinity')
-            for m in self._board.legal_moves():
-                if(time.time()-self._time>self._timelimit):
-                    break
-                self._board.push(m)
-                v=self.Minimax(depth-1,True)
-                bestValue=min(bestValue,v)
-                self._board.pop()
-            return bestValue
-
     def AlphaBeta(self,depth,alpha,beta,maximizingPlayer):
 
         if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
+            #return self._board.heuristique(self._mycolor)
             return self.heuristique(self._mycolor)
 
         elif not maximizingPlayer:
@@ -137,56 +111,7 @@ class myPlayer(PlayerInterface):
                 if v>=beta:
                     break # beta cut-off
                 alpha = max(alpha, v)
-        return v
-
-    def NegaMax(self,depth,alpha,beta,player):
-
-        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
-            return self.heuristique(self._mycolor)
-
-        value=-float('infinity')
-        for m in self._board.legal_moves():
-            if(time.time()-self._time>self._timelimit):
-                    break
-            self._board.push(m)
-            value=max(value,-self.NegaMax(depth-1,-beta,-alpha, not player))
-            self._board.pop()
-            alpha=max(alpha,value)
-            if alpha>=beta:
-                break #cut off
-        return value
-
-    def NegaScout(self,depth,alpha,beta,maximizingPlayer):
-        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
-            #return self._board.heuristique(self._mycolor)
-            return self.heuristique(self._mycolor)
-        
-        cpt=0
-        for m in self._board.legal_moves():
-            if cpt==0:
-                cpt=1
-                if(time.time()-self._time>self._timelimit):
-                    break
-                self._board.push(m)
-                score=-self.NegaScout(depth-1,-beta,-alpha,not maximizingPlayer)
-                self._board.pop()
-            else:
-                if(time.time()-self._time>self._timelimit):
-                    break
-                self._board.push(m) #search with a null window
-                score=-self.NegaScout(depth-1,-alpha -1,-alpha,not maximizingPlayer)
-                self._board.pop()
-                if (alpha < score and score < beta):
-                    if(time.time()-self._time>self._timelimit):
-                        break
-                    self._board.push(m) #if it failed high, do a full research
-                    score=-self.NegaScout(depth-1,-beta,-score,not maximizingPlayer)
-                    self._board.pop()
-            alpĥa=max(alpha,score)
-            if alpha >= beta:
-                break #beta cut off
-        return alpha
-        
+        return v 
 
     def bestMove(self):
         maxPoints = -(float('infinity'))
@@ -195,10 +120,7 @@ class myPlayer(PlayerInterface):
         for i in range(1,97):
             for m in self._board.legal_moves():
 
-                #points = self.AlphaBeta(self._depth,-float('infinity'),float('infinity'), True)
-                #points = self.Minimax(depth, True)
-                #points=self.NegaMax(self._depth,-float('infinity'),float('infinity'),True)
-                points=self.NegaScout(i,-float('infinity'),float('infinity'),True)
+                points = self.AlphaBeta(i,-float('infinity'),float('infinity'), True)
 
                 if points >= maxPoints:
                         maxPoints = points
