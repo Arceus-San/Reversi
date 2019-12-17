@@ -11,7 +11,7 @@ cptRand=0
 cptEgal=0
 cptIM=0
 
-for i in range(0,5):
+for i in range(0,1):
     b = Reversi.Board(10)
 
     players = []
@@ -41,7 +41,7 @@ for i in range(0,5):
         nbmoves += 1
         otherplayer = (nextplayer + 1) % 2
         othercolor = b._BLACK if nextplayercolor == b._WHITE else b._WHITE
-        
+
         currentTime = time.time()
         sys.stdout = stringio
         move = players[nextplayer].getPlayerMove()
@@ -52,7 +52,7 @@ for i in range(0,5):
         outputs[nextplayer] += playeroutput
         totalTime[nextplayer] += time.time() - currentTime
         print("Player ", nextplayercolor, players[nextplayer].getPlayerName(), "plays" + str(move))
-        (x,y) = move 
+        (x,y) = move
         if not b.is_valid_move(nextplayercolor,x,y):
             print(otherplayer, nextplayer, nextplayercolor)
             print("Problem: illegal move")

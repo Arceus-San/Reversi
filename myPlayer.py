@@ -10,8 +10,8 @@ class myPlayer(PlayerInterface):
     def __init__(self):
         self._board = Reversi.Board(10)
         self._mycolor = None
-        self._depth = 4
-        
+        self._depth = 10
+
         self._minEvalBoard = 0 # min - 1
         self._maxEvalBoard = self._board._boardsize * self._board._boardsize + 4 * self._board._boardsize + 4 + 1 # max + 1
 
@@ -30,7 +30,7 @@ class myPlayer(PlayerInterface):
         assert(c==self._mycolor)
         print("My current board :")
         print(self._board)
-        return (x,y) 
+        return (x,y)
 
     def playOpponentMove(self, x,y):
         assert(self._board.is_valid_move(self._opponent, x, y))
@@ -57,7 +57,7 @@ class myPlayer(PlayerInterface):
             for y in range(self._board._boardsize):
                 if(self._board._board[x][y]==self._mycolor):
                     if (x == 0 or x == self._board._boardsize - 1) and (y == 0 or y == self._board._boardsize - 1):
-                        tot +=5 # corner                     
+                        tot +=10 # corner
                     elif ((x>1 and x<self._board._boardsize - 2 and (y==0 or y==self._board._boardsize - 1)) or (y>1 and y<self._board._boardsize - 2 and (x==0 or x==self._board._boardsize - 1))):
                         tot +=3
                     elif(x>1 and x<self._board._boardsize - 2 and y>1 and y<self._board._boardsize - 2):
@@ -66,10 +66,10 @@ class myPlayer(PlayerInterface):
                         tot+=2
                     else:
                         tot += 1
-    
+
         return tot
-    
-    
+
+
         ''' 5133333315
             1122222211
             3244444423
@@ -80,71 +80,114 @@ class myPlayer(PlayerInterface):
             3244444423
             1122222211
             5133333315'''
-    
+
     def Minimax(self, depth, maximizingPlayer):
-        
-        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):  
+
+        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
             #return self._board.heuristique(self._mycolor)
             return self.heuristique(self._mycolor)
 
         if maximizingPlayer:
-            bestValue = self._minEvalBoard
+            bestValue = -(float('infinity'))
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v=self.Minimax(depth-1,False)
-                self._board.pop()
                 bestValue=max(bestValue,v)
-                
+                self._board.pop()
+            return bestValue
+
         else: #minimizingplayer
-            bestValue = self._maxEvalBoard
+            bestValue = float('infinity')
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v=self.Minimax(depth-1,True)
-
-                self._board.pop()
                 bestValue=min(bestValue,v)
-                
-        return bestValue
-    
+                self._board.pop()
+            return bestValue
+
     def AlphaBeta(self,depth,alpha,beta,maximizingPlayer):
-        
-        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):  
+
+        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
             #return self._board.heuristique(self._mycolor)
             return self.heuristique(self._mycolor)
-        
-        if maximizingPlayer:
-            v = self._minEvalBoard
+
+        elif not maximizingPlayer:
+            v =float('infinity')
+            for m in self._board.legal_moves():
+                self._board.push(m)
+                #v=v = min(v, self.AlphaBeta(depth - 1, -beta, alpha, True))
+                v= min(v, self.AlphaBeta(depth - 1, alpha, beta, True))
+                self._board.pop()
+                if alpha>=v:
+                    break # alpha cut-off
+                beta = min(beta, v)
+
+        else:
+            v = -(float('infinity'))
             for m in self._board.legal_moves():
                 self._board.push(m)
                 v= max(v,self.AlphaBeta(depth - 1, alpha, beta, False))
                 self._board.pop()
-                alpha = max(alpha, v)
-                if beta <= alpha:
+                if v>=beta:
                     break # beta cut-off
-            return v
+                alpha = max(alpha, v)
+        return v
+
+    def NegaMax(self,depth,alpha,beta,player):
+
+        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
+            #return self._board.heuristique(self._mycolor)
+            return self.heuristique(self._mycolor)
+
+        value=-float('infinity')
+        for m in self._board.legal_moves():
+            self._board.push(m)
+            value=max(value,-self.NegaMax(depth-1,-beta,-alpha, not player))
+            self._board.pop()
+            alpha=max(alpha,value)
+            if alpha>=beta:
+                break #cut off
+        return value
+
+    def NegaScout(self,depth,alpha,beta,maximizingPlayer):
+        if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
+            #return self._board.heuristique(self._mycolor)
+            return self.heuristique(self._mycolor)
         
-        else:
-            v =self._maxEvalBoard
-            for m in self._board.legal_moves():
+        cpt=0
+        for m in self._board.legal_moves():
+            if cpt==0:
+                cpt=1
                 self._board.push(m)
-                v=v = min(v, self.AlphaBeta(depth - 1, alpha, beta, True))
+                score=-self.NegaScout(depth-1,-beta,-alpha,not maximizingPlayer)
                 self._board.pop()
-                beta = min(beta, v)
-                if beta <= alpha:
-                    break # alpha cut-off
-                    
-            return v
+            else:
+                self._board.push(m) #search with a null window
+                score=-self.NegaScout(depth-1,-alpha -1,-alpha,not maximizingPlayer)
+                self._board.pop()
+                if (alpha < score and score < beta):
+                    self._board.push(m) #if it failed high, do a full research
+                    score=-self.NegaScout(depth-1,-beta,-score,not maximizingPlayer)
+                    self._board.pop()
+            alpĥa=max(alpha,score)
+            if alpha >= beta:
+                break #beta cut off
+        return alpha
+        
 
     def bestMove(self, depth):
-        maxPoints = 0
+        maxPoints = -(float('infinity'))
         mx = -1; my = -1
         for m in self._board.legal_moves():
             print(m)
-            
-            points = self.AlphaBeta(depth,self._minEvalBoard,self._maxEvalBoard, True)
+
+            #points = self.AlphaBeta(self._depth,-float('infinity'),float('infinity'), True)
             #points = self.Minimax(depth, True)
-            
-            if points > maxPoints:
+            #points=self.NegaMax(self._depth,-float('infinity'),float('infinity'),True)
+            points=self.NegaScout(self._depth,-float('infinity'),float('infinity'),True)
+
+
+            if points >= maxPoints:
                     maxPoints = points
                     mx = m[1]; my = m[2]
         print("player=",self._mycolor," mx=",mx," my=",my)
