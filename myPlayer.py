@@ -57,7 +57,7 @@ class myPlayer(PlayerInterface):
             for y in range(self._board._boardsize):
                 if(self._board._board[x][y]==self._mycolor):
                     if (x == 0 or x == self._board._boardsize - 1) and (y == 0 or y == self._board._boardsize - 1):
-                        tot +=10 # corner
+                        tot +=100 # corner
                     elif ((x>1 and x<self._board._boardsize - 2 and (y==0 or y==self._board._boardsize - 1)) or (y>1 and y<self._board._boardsize - 2 and (x==0 or x==self._board._boardsize - 1))):
                         tot +=3
                     elif(x>1 and x<self._board._boardsize - 2 and y>1 and y<self._board._boardsize - 2):
@@ -178,17 +178,20 @@ class myPlayer(PlayerInterface):
     def bestMove(self, depth):
         maxPoints = -(float('infinity'))
         mx = -1; my = -1
-        for m in self._board.legal_moves():
-            print(m)
+        debut=time.time()
+        for i in range(1,97):
+            for m in self._board.legal_moves():
 
-            #points = self.AlphaBeta(self._depth,-float('infinity'),float('infinity'), True)
-            #points = self.Minimax(depth, True)
-            #points=self.NegaMax(self._depth,-float('infinity'),float('infinity'),True)
-            points=self.NegaScout(self._depth,-float('infinity'),float('infinity'),True)
+                #points = self.AlphaBeta(self._depth,-float('infinity'),float('infinity'), True)
+                #points = self.Minimax(depth, True)
+                #points=self.NegaMax(self._depth,-float('infinity'),float('infinity'),True)
+                points=self.NegaScout(i,-float('infinity'),float('infinity'),True)
 
+                if points >= maxPoints:
+                        maxPoints = points
+                        mx = m[1]; my = m[2]
 
-            if points >= maxPoints:
-                    maxPoints = points
-                    mx = m[1]; my = m[2]
-        print("player=",self._mycolor," mx=",mx," my=",my)
+                if(time.time()-debut>6):
+                    return [self._mycolor, mx, my]
+
         return [self._mycolor, mx, my]

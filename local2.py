@@ -11,6 +11,8 @@ cptRand=0
 cptEgal=0
 cptIM=0
 
+debut = time.time()#
+
 for i in range(0,1):
     b = Reversi.Board(10)
 
@@ -31,11 +33,16 @@ for i in range(0,1):
     sysstdout= sys.stdout
     stringio = StringIO()
 
+    totalmoves=0 #
+
+    beforetime=0
+
     print(b.legal_moves())
     while not b.is_game_over():
         print("Referee Board:")
         print(b)
         print("Before move", nbmoves)
+        print("Before time", beforetime)
         print("Legal Moves: ", b.legal_moves())
 
         nbmoves += 1
@@ -51,6 +58,9 @@ for i in range(0,1):
         print(("[Player "+str(nextplayer) + "] ").join(playeroutput.splitlines(True)))
         outputs[nextplayer] += playeroutput
         totalTime[nextplayer] += time.time() - currentTime
+        if(players[nextplayer]==player1):#
+            totalmoves+=1#
+            beforetime=time.time()-currentTime
         print("Player ", nextplayercolor, players[nextplayer].getPlayerName(), "plays" + str(move))
         (x,y) = move
         if not b.is_valid_move(nextplayercolor,x,y):
@@ -86,3 +96,6 @@ print("Victoires AI :",cptAI)
 print("Victoires Random :",cptRand)
 print("Victoires Egalité :",cptEgal)
 print("Illegal Moves :",cptIM)
+print("")
+print("Temps Total:", time.time() -debut)
+print("Nb coups joués:", totalmoves)
