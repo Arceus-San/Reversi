@@ -15,6 +15,7 @@ class myPlayer(PlayerInterface):
         self._maxEvalBoard = self._board._boardsize * self._board._boardsize + 4 * self._board._boardsize + 4 + 1 # max + 1
         self._time=0
         self._timelimit=6.24
+        self._tour=0
     
     def getPlayerName(self):
         return "AI Player"
@@ -23,6 +24,7 @@ class myPlayer(PlayerInterface):
         if self._board.is_game_over():
             print("Referee told me to play but the game is over!")
             return (-1,-1)
+        self._tour+=1
         move=self.bestMove()
         print(move)
         self._board.push(move)
@@ -189,6 +191,11 @@ class myPlayer(PlayerInterface):
         
 
     def bestMove(self):
+        if self._tour<5:
+            moves = [m for m in self._board.legal_moves()]
+            move = moves[randint(0,len(moves)-1)]
+            return move
+        
         maxPoints = -(float('infinity'))
         mx = -1; my = -1
         self._time=time.time()

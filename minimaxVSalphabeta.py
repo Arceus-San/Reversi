@@ -43,7 +43,8 @@ for i in range(0,5):
         print(b)
         print("Before move", nbmoves)
         print("Before time", beforetime)
-        print("Temps Total:", time.time() -debut)
+        print("Time:", totalTime)
+        print("Victoires AlphaBeta :",cptAI," / Victoires MiniMax :",cptRand)
         print("Legal Moves: ", b.legal_moves())
 
         nbmoves += 1
