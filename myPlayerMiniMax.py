@@ -11,13 +11,11 @@ class myPlayer(PlayerInterface):
         self._board = Reversi.Board(10)
         self._mycolor = None
 
-        self._minEvalBoard = 0 # min - 1
-        self._maxEvalBoard = self._board._boardsize * self._board._boardsize + 4 * self._board._boardsize + 4 + 1 # max + 1
         self._time=0
-        self._timelimit=6.24
+        self._timelimit=6.25
     
     def getPlayerName(self):
-        return "AI Player"
+        return "MiniMax Player"
 
     def getPlayerMove(self):
         if self._board.is_game_over():
@@ -125,6 +123,8 @@ class myPlayer(PlayerInterface):
                         mx = m[1]; my = m[2]
 
                 if(time.time()-self._time>self._timelimit):
+                    print("Profondeur : ",i)
                     return [self._mycolor, mx, my]
 
+        print("Profondeur : ",i)
         return [self._mycolor, mx, my]

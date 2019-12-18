@@ -1,6 +1,6 @@
 #import Reversi
 import Reversi
-import myPlayer
+import myPlayerAlphaBeta
 import myPlayerMiniMax
 import time
 from io import StringIO
@@ -12,16 +12,15 @@ cptEgal=0
 cptIM=0
 
 debut = time.time()#
-meantime=0
 
 for i in range(0,5):
     b = Reversi.Board(10)
 
     players = []
-    player1 = myPlayer.myPlayer()
+    player1 = myPlayerMiniMax.myPlayer()
     player1.newGame(b._BLACK)
     players.append(player1)
-    player2 = myPlayerMiniMax.myPlayer()
+    player2 = myPlayerAlphaBeta.myPlayer()
     player2.newGame(b._WHITE)
     players.append(player2)
 
@@ -37,7 +36,6 @@ for i in range(0,5):
     totalmoves=0 #
 
     beforetime=0
-    partytime=0
 
     print(b.legal_moves())
     while not b.is_game_over():
@@ -46,8 +44,7 @@ for i in range(0,5):
         print("Before move", nbmoves)
         print("Before time", beforetime)
         print("Time:", totalTime)
-        print("Temps moyen par partie : ",meantime)
-        print("Victoires NegaScout :",cptAI," / Victoires MiniMax :",cptRand)
+        print("Victoires MiniMax :",cptAI," / Victoires AlphaBeta :",cptRand)
         print("Legal Moves: ", b.legal_moves())
 
         nbmoves += 1
@@ -96,13 +93,9 @@ for i in range(0,5):
         print("DEUCE")
         cptEgal+=1
 
-    
-    partytime+=totalTime[0]
-    meantime=partytime/(i+1)
 
-
-print("Victoires NegaScout :",cptAI)
-print("Victoires MiniMax :",cptRand)
+print("Victoires MiniMax :",cptAI)
+print("Victoires AlphaBeta :",cptRand)
 print("Victoires Egalité :",cptEgal)
 print("Illegal Moves :",cptIM)
 print("")

@@ -14,10 +14,10 @@ class myPlayer(PlayerInterface):
         self._minEvalBoard = 0 # min - 1
         self._maxEvalBoard = self._board._boardsize * self._board._boardsize + 4 * self._board._boardsize + 4 + 1 # max + 1
         self._time=0
-        self._timelimit=6.24
+        self._timelimit=7
     
     def getPlayerName(self):
-        return "AI Player"
+        return "AlphaBeta Player"
 
     def getPlayerMove(self):
         if self._board.is_game_over():
@@ -48,6 +48,170 @@ class myPlayer(PlayerInterface):
         else:
             print("I lost :(!!")
 
+
+    def getWinner(self):
+        if(self._board.is_game_over):
+            (nbwhites, nbblacks) = self._board.get_nb_pieces()
+            if(nbwhites>nbblacks):
+                return self._board._WHITE
+            elif(nbwhites<nbblacks):
+                return self._board._BLACK
+
+    def heuristiquef(self,color):
+        eval=0
+        (nbwhites, nbblacks) = self._board.get_nb_pieces()
+        total=nbblacks+nbwhites
+
+        #Winning take high priority in endgame
+        if(self.getWinner()==self._mycolor and (total)>85):
+            return 10000
+
+        #Corners highly valued
+        if(self._board._board[0][0]==color or self._board.is_valid_move(color,0,0)):
+            eval+=400
+        if(self._board._board[9][9]==color or self._board.is_valid_move(color,9,9)):
+            eval+=400
+        if(self._board._board[0][9]==color or self._board.is_valid_move(color,0,9)):
+            eval+=400
+        if(self._board._board[9][0]==color or self._board.is_valid_move(color,9,0)):
+            eval+=400
+
+        #Giving corners is bad
+        '''adversaire=self._board._WHITE
+
+        if(self._mycolor==self._board._WHITE):
+            adversaire=self._board._BLACK
+
+        if(self._board._board[0][1]==color and self._board.is_valid_move(adversaire,0,0)):
+            eval+=200
+        if(self._board._board[1][0]==color and self._board.is_valid_move(adversaire,0,0)):
+            eval+=200
+        if(self._board._board[1][1]==color and self._board.is_valid_move(adversaire,0,0)):
+            eval-=200'''
+
+        if(self._board._board[0][1]==color and self._board._board[0][0]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[1][0]==color and self._board._board[0][0]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[1][1]==color and self._board._board[0][0]==self._board._EMPTY):
+            eval-=200
+
+        if(self._board._board[0][8]==color and self._board._board[0][9]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[1][9]==color and self._board._board[0][9]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[1][8]==color and self._board._board[0][9]==self._board._EMPTY):
+            eval-=200
+
+        if(self._board._board[8][1]==color and self._board._board[9][0]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[8][0]==color and self._board._board[9][0]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[9][1]==color and self._board._board[9][0]==self._board._EMPTY):
+            eval-=200
+
+        if(self._board._board[8][8]==color and self._board._board[9][9]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[8][9]==color and self._board._board[9][9]==self._board._EMPTY):
+            eval-=200
+        if(self._board._board[9][8]==color and self._board._board[9][9]==self._board._EMPTY):
+            eval-=200
+
+        #Edges valued
+        for i in range(self._board._boardsize):
+            if(self._board._board[i][0]==color):
+                eval+=20
+            if(self._board._board[i][9]==color):
+                eval+=20
+            if(self._board._board[0][i]==color):
+                eval+=20
+            if(self._board._board[9][i]==color):
+                eval+=20
+
+        #Having more pieces than opponent is values, especially late game
+        if(total>78):
+            if(color==self._board._BLACK):
+                eval+=20*(nbblacks-nbwhites)
+            else:
+                eval+=20*(nbwhites-nbblacks)
+
+        #Minimize their moves mid to late game
+        if(self._board._nextPlayer==self._board._WHITE)
+        '''if(total>47):
+            if(self.)
+            if(color==self._board._WHITE):
+                adversaire=self._board._BLACK
+            else:
+                adversaire=self._board._WHITE
+            
+            self._mycolor=adversaire
+
+            moves=self._board.legal_moves
+            if(moves.length==0):
+                eval+=200
+            elif(moves.length<3):
+                eval+=100
+            else:
+                eval-=moves.length*25
+
+            self._mycolor=color'''
+
+        #Try to have one piece in each col/row midgame
+        if(total>31 and total<=78):
+            for y in range(self._board.get_board_size()):
+                cnt=0
+                for x in range(self._board.get_board_size()):
+                    if(self._board._board[x][y]==color):
+                        cnt+=1
+                if(cnt>0):
+                    eval+=10
+
+            for x in range(self._board.get_board_size()):
+                cnt=0
+                for y in range(self._board.get_board_size()):
+                    if(self._board._board[x][y]==color):
+                        cnt+=1
+                if(cnt>0):
+                    eval+=10
+
+        #Secured rows are valuable
+        for y in range(0,self._board.get_board_size(),9):
+            for x in range(self._board.get_board_size()):
+                if(self._board._board[0][y]==color):
+                    if(self._board._board[x][y]!=color):
+                        break
+                    eval+=20
+
+            for x in range(self._board.get_board_size()-1,x>=0,-1):
+                if(self._board._board[9][y]==color):
+                    if(self._board._board[x][y]!=color):
+                        break
+                    eval+=20
+
+        #Secured cols are valuable
+        for x in range(0,self._board.get_board_size(),9):
+            for y in range(self._board.get_board_size()):
+                if(self._board._board[x][0]==color):
+                    if(self._board._board[x][y]!=color):
+                        break
+                    eval+=20
+
+            for y in range(self._board.get_board_size()-1,y>=0,-1):
+                if(self._board._board[9][y]==color):
+                    if(self._board._board[x][y]!=color):
+                        break
+                    eval+=20
+        
+        return eval
+
+        
+    def heuristique2(self, player=None):
+        adversaire=self._board._WHITE
+
+        if(self._mycolor==self._board._WHITE):
+            adversaire=self._board._BLACK
+
+        return self.heuristiquef(self._mycolor)-self.heuristiquef(adversaire)
 
     def heuristique(self, player=None):
         if player is None:
@@ -86,7 +250,7 @@ class myPlayer(PlayerInterface):
 
         if depth ==0 or not(self._board.at_least_one_legal_move(self._mycolor)):
             #return self._board.heuristique(self._mycolor)
-            return self.heuristique(self._mycolor)
+            return self.heuristiquef(self._mycolor)
 
         elif not maximizingPlayer:
             v =float('infinity')
@@ -127,6 +291,8 @@ class myPlayer(PlayerInterface):
                         mx = m[1]; my = m[2]
 
                 if(time.time()-self._time>self._timelimit):
+                    print("Profondeur : ",i)
                     return [self._mycolor, mx, my]
 
+        print("Profondeur : ",i)
         return [self._mycolor, mx, my]
